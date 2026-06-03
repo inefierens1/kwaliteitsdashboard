@@ -1,4 +1,4 @@
-downloadPDF(\'aanbev-text\',\'Aanbevelingen\',S.verg.c)">&#8659; Download als PDF</button>'downloadPDF(\'oa-text\',\'Samenvatting\',S.verg.c)">&#8659; Download als PDF</button>'<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
@@ -374,11 +374,14 @@ function buildVergClusterBtns() {
   VERG_CLUSTERS.forEach(function(c) {
     var on = c === S.verg.c ? ' on' : '';
     var label = c + (!LKR[c] ? ' (enkel CST)' : '');
-    h += '<button class="oa-cbtn' + on + '" onclick="selectVC(\'' + c.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\',this)">' + label + '</button>';
+    var btn = document.createElement('button');
+    btn.className = 'oa-cbtn' + on;
+    btn.textContent = label;
+    btn.setAttribute('data-cluster', c);
+    btn.onclick = function(){ selectVC(this.getAttribute('data-cluster'), this); };
+    el.appendChild(btn);
   });
-  el.innerHTML = h;
 }
-
 function selectVC(c, btn) {
   S.verg.c = c;
   document.querySelectorAll('.oa-cbtn').forEach(function(b){ b.classList.remove('on'); });
@@ -456,7 +459,13 @@ function generateOA() {
       return;
     }
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
-    out.innerHTML = '<div class="oa-result" id="oa-text">' + mdToHtml(text) + '</div><button class="dl-btn" onclick="downloadPDF('oa-text','Samenvatting',S.verg.c)">&#8659; Download als PDF</button>';
+    window._pdfCluster = S.verg.c;
+    out.innerHTML = '<div class="oa-result" id="oa-text">' + mdToHtml(text) + '</div>';
+    var btn1 = document.createElement('button');
+    btn1.className = 'dl-btn';
+    btn1.innerHTML = '&#8659; Download als PDF';
+    btn1.onclick = function(){ downloadPDF('oa-text', 'Samenvatting', window._pdfCluster||''); };
+    out.appendChild(btn1);
   }).catch(function(e){
     out.textContent = 'Fout: ' + e.message;
   });
@@ -495,28 +504,34 @@ function generateAanbev() {
   .then(function(r){return r.json();}).then(function(d){
     if (d.error) { out.textContent = 'API fout: ' + d.error.type + ' - ' + d.error.message; return; }
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
-    out.innerHTML = '<div class="oa-result" id="aanbev-text">' + mdToHtml(text) + '</div><button class="dl-btn" onclick="downloadPDF('aanbev-text','Aanbevelingen',S.verg.c)">&#8659; Download als PDF</button>';
+    window._pdfCluster = S.verg.c;
+    out.innerHTML = '<div class="oa-result" id="aanbev-text">' + mdToHtml(text) + '</div>';
+    var btn2 = document.createElement('button');
+    btn2.className = 'dl-btn';
+    btn2.innerHTML = '&#8659; Download als PDF';
+    btn2.onclick = function(){ downloadPDF('aanbev-text', 'Aanbevelingen', window._pdfCluster||''); };
+    out.appendChild(btn2);
   }).catch(function(e){
     out.textContent = 'Fout: ' + e.message;
   });
 }
 
 function mdToHtml(text) {
-  return text
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/^---+$/gm, '<hr>')
-    .replace(/^\- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>
-?)+/g, function(m){ return '<ul>' + m + '</ul>'; })
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/
+  var t = text;
+  t = t.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  t = t.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  t = t.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  t = t.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  t = t.replace(/^---+$/gm, '<hr>');
+  t = t.replace(/^\- (.+)$/gm, '<li>$1</li>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/
 
-/g, '<br>')
-    .replace(/
+/g, '<br><br>');
+  t = t.replace(/(<li>[^<]*<\/li>(<br>)?)+/g, function(m){ return '<ul>' + m.replace(/<br>/g,'') + '</ul>'; });
+  t = t.replace(/
 /g, '<br>');
+  return t;
 }
 
 function downloadPDF(elId, titel, cluster) {
