@@ -523,14 +523,11 @@ function mdToHtml(text) {
   t = t.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   t = t.replace(/^# (.+)$/gm, '<h1>$1</h1>');
   t = t.replace(/^---+$/gm, '<hr>');
-  t = t.replace(/^\- (.+)$/gm, '<li>$1</li>');
+  t = t.replace(/^- (.+)$/gm, '<li>$1</li>');
   t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  t = t.replace(/
-
-/g, '<br><br>');
+  t = t.replace(/\n\n/g, '<br><br>');
   t = t.replace(/(<li>[^<]*<\/li>(<br>)?)+/g, function(m){ return '<ul>' + m.replace(/<br>/g,'') + '</ul>'; });
-  t = t.replace(/
-/g, '<br>');
+  t = t.replace(/\n/g, '<br>');
   return t;
 }
 
