@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+downloadPDF(\'aanbev-text\',\'Aanbevelingen\',S.verg.c)">&#8659; Download als PDF</button>'downloadPDF(\'oa-text\',\'Samenvatting\',S.verg.c)">&#8659; Download als PDF</button>'<!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
@@ -74,6 +74,14 @@ body{font-family:var(--font);background:var(--lg);color:var(--blk);font-size:14p
 .panel-title{font-size:18px;font-weight:700;color:var(--dg);margin-bottom:16px;padding-bottom:8px;border-bottom:3px solid var(--lg2);}
 .nd{text-align:center;color:var(--gr);font-size:12px;padding:20px;}
 footer{text-align:center;padding:14px;font-size:10px;color:var(--gr);border-top:1px solid var(--pp);margin-top:20px;}
+.dl-btn{background:#4d5554;color:#fff;border:none;border-radius:4px;padding:7px 16px;font-family:var(--font);font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.4px;margin-top:12px;transition:background .15s;display:inline-flex;align-items:center;gap:6px;}
+.dl-btn:hover{background:#889a91;}
+.oa-result h1{font-size:15px;font-weight:700;color:var(--dg);margin:12px 0 4px;}
+.oa-result h2{font-size:13px;font-weight:700;color:var(--dg);margin:10px 0 4px;}
+.oa-result h3{font-size:12px;font-weight:700;color:var(--lg2);margin:8px 0 3px;}
+.oa-result hr{border:none;border-top:1px solid var(--pp);margin:8px 0;}
+.oa-result ul{padding-left:16px;margin:2px 0;}
+.oa-result li{margin-bottom:2px;font-size:12px;}
 @media(max-width:700px){.hdr-title{display:none;}.ptab{padding:10px 12px;font-size:10px;}}
 </style>
 </head>
@@ -448,7 +456,7 @@ function generateOA() {
       return;
     }
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
-    out.innerHTML = '<div class="oa-result">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div>';
+    out.innerHTML = '<div class="oa-result" id="oa-text">' + mdToHtml(text) + '</div><button class="dl-btn" onclick="downloadPDF('oa-text','Samenvatting',S.verg.c)">&#8659; Download als PDF</button>';
   }).catch(function(e){
     out.textContent = 'Fout: ' + e.message;
   });
@@ -487,10 +495,81 @@ function generateAanbev() {
   .then(function(r){return r.json();}).then(function(d){
     if (d.error) { out.textContent = 'API fout: ' + d.error.type + ' - ' + d.error.message; return; }
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
-    out.innerHTML = '<div class="oa-result">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div>';
+    out.innerHTML = '<div class="oa-result" id="aanbev-text">' + mdToHtml(text) + '</div><button class="dl-btn" onclick="downloadPDF('aanbev-text','Aanbevelingen',S.verg.c)">&#8659; Download als PDF</button>';
   }).catch(function(e){
     out.textContent = 'Fout: ' + e.message;
   });
+}
+
+function mdToHtml(text) {
+  return text
+    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^---+$/gm, '<hr>')
+    .replace(/^\- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>
+?)+/g, function(m){ return '<ul>' + m + '</ul>'; })
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/
+
+/g, '<br>')
+    .replace(/
+/g, '<br>');
+}
+
+function downloadPDF(elId, titel, cluster) {
+  var el = document.getElementById(elId);
+  if (!el || !el.textContent.trim()) return;
+  var datum = new Date().toLocaleDateString('nl-BE', {day:'2-digit',month:'long',year:'numeric'});
+  var w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">');
+  w.document.write('<title>' + titel + ' - ' + cluster + '</title>');
+  w.document.write('<style>');
+  w.document.write('@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");');
+  w.document.write('*{margin:0;padding:0;box-sizing:border-box;}');
+  w.document.write('body{font-family:"Open Sans","Calibri",sans-serif;color:#000;background:#fff;padding:0;}');
+  w.document.write('.page{padding:40px 50px;max-width:800px;margin:0 auto;}');
+  w.document.write('.header{background:#4d5554;color:#fff;padding:20px 50px;display:flex;align-items:center;gap:16px;margin-bottom:32px;}');
+  w.document.write('.logo-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}');
+  w.document.write('.logo-text .nm{font-size:14px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#fff;}');
+  w.document.write('.logo-text .sb{font-size:8px;font-weight:300;opacity:.75;letter-spacing:1px;color:#fff;}');
+  w.document.write('.header-title{font-size:12px;font-weight:600;padding-left:14px;border-left:2px solid rgba(255,255,255,.3);color:#fff;}');
+  w.document.write('.doc-title{font-size:20px;font-weight:700;color:#4d5554;margin-bottom:4px;}');
+  w.document.write('.doc-sub{font-size:12px;color:#999;margin-bottom:24px;}');
+  w.document.write('.divider{height:3px;background:#889a91;margin-bottom:24px;border-radius:2px;}');
+  w.document.write('h1{font-size:15px;font-weight:700;color:#4d5554;margin:20px 0 6px;padding-bottom:4px;border-bottom:2px solid #ced7d2;}');
+  w.document.write('h2{font-size:14px;font-weight:700;color:#4d5554;margin:16px 0 6px;}');
+  w.document.write('h3{font-size:12px;font-weight:700;color:#889a91;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px;}');
+  w.document.write('h4{font-size:12px;font-weight:700;color:#4d5554;margin:10px 0 4px;}');
+  w.document.write('ul{padding-left:18px;margin:4px 0 10px;}');
+  w.document.write('li{font-size:11px;line-height:1.7;color:#333;margin-bottom:1px;}');
+  w.document.write('p{font-size:11px;line-height:1.7;color:#333;margin-bottom:8px;}');
+  w.document.write('hr{border:none;border-top:1px solid #c8c6c7;margin:16px 0;}');
+  w.document.write('strong{color:#4d5554;}');
+  w.document.write('.footer{margin-top:40px;padding-top:12px;border-top:1px solid #c8c6c7;font-size:9px;color:#999;display:flex;justify-content:space-between;}');
+  w.document.write('@media print{.no-print{display:none!important;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}');
+  w.document.write('</style></head><body>');
+  // Header
+  w.document.write('<div class="header">');
+  w.document.write('<div class="logo-wrap">');
+  w.document.write('<svg width="26" height="30" viewBox="0 0 40 46" xmlns="http://www.w3.org/2000/svg"><polygon points="20,2 38,12 20,22 2,12" fill="#a28790"/><polygon points="2,12 20,22 20,42 2,32" fill="#889a91"/><polygon points="38,12 20,22 20,42 38,32" fill="#4a4247"/></svg>');
+  w.document.write('<div class="logo-text"><div class="nm">Crescendo CVO</div><div class="sb">centrum voor volwassenenonderwijs</div></div>');
+  w.document.write('</div>');
+  w.document.write('<div class="header-title">Kwaliteitsdashboard &#8212; Loop van Kwaliteitsontwikkeling</div>');
+  w.document.write('</div>');
+  // Content
+  w.document.write('<div class="page">');
+  w.document.write('<div class="doc-title">' + titel + '</div>');
+  w.document.write('<div class="doc-sub">Cluster: ' + cluster + ' &nbsp;&bull;&nbsp; Gegenereerd op ' + datum + '</div>');
+  w.document.write('<div class="divider"></div>');
+  w.document.write(el.innerHTML);
+  w.document.write('<div class="footer"><span>Crescendo CVO &mdash; centrum voor volwassenenonderwijs &mdash; Vaartdijk 86, 2800 Mechelen</span><span>' + datum + '</span></div>');
+  w.document.write('</div>');
+  w.document.write('<script>window.onload=function(){window.print();}<\/script>');
+  w.document.write('</body></html>');
+  w.document.close();
 }
 
 function render() {
