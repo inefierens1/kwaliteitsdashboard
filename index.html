@@ -441,16 +441,12 @@ function generateOA() {
     });
     prompt += '\n';
   });
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':'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'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();}).then(function(d){
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
     out.innerHTML = '<div class="oa-result">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div>';
   }).catch(function(e){
-    if (e.message && e.message.indexOf('fetch') >= 0) {
-      out.innerHTML = '<div style="background:#fff8e1;border-left:3px solid #c9a227;padding:10px;font-size:11px;border-radius:4px"><strong>&#9888; Opmerking:</strong> Dit dashboard moet geopend worden als claude.ai artifact (niet als lokaal bestand) om AI-functies te gebruiken. Vraag je beheerder om het te publiceren als claude.ai artifact en via een iframe in SharePoint in te bedden.</div>';
-    } else {
-      out.textContent = 'Fout: ' + e.message;
-    }
+    out.textContent = 'Fout: ' + e.message;
   });
 }
 
@@ -483,16 +479,12 @@ function generateAanbev() {
     });
   }
   var prompt = 'Je bent kwaliteitsmedewerker bij Crescendo CVO (centrum voor volwassenenonderwijs). Formuleer op basis van onderstaande kwaliteitsdata concrete aanbevelingen voor verbetering. Vermeld de afnamedatum en geef aan dat sommige zaken mogelijk al zijn aangepakt. Wees specifiek en praktisch. Schrijf in het Nederlands met bullets.\n\n' + d + '\nOpen antwoorden samenvatting:\n' + oaStr;
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':'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'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();}).then(function(d){
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
     out.innerHTML = '<div class="oa-result">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') + '</div>';
   }).catch(function(e){
-    if (e.message && e.message.indexOf('fetch') >= 0) {
-      out.innerHTML = '<div style="background:#fff8e1;border-left:3px solid #c9a227;padding:10px;font-size:11px;border-radius:4px"><strong>&#9888; Opmerking:</strong> Dit dashboard moet geopend worden als claude.ai artifact om AI-functies te gebruiken.</div>';
-    } else {
-      out.textContent = 'Fout: ' + e.message;
-    }
+    out.textContent = 'Fout: ' + e.message;
   });
 }
 
