@@ -441,7 +441,7 @@ function generateOA() {
     });
     prompt += '\n';
   });
-  fetch('https://anthropic-proxy.inefierens.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://anthropic-proxy.inefierens.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();}).then(function(d){
     if (d.error) {
       out.textContent = 'API fout: ' + d.error.type + ' - ' + d.error.message;
@@ -483,7 +483,7 @@ function generateAanbev() {
     });
   }
   var prompt = 'Je bent kwaliteitsmedewerker bij Crescendo CVO (centrum voor volwassenenonderwijs). Formuleer op basis van onderstaande kwaliteitsdata concrete aanbevelingen voor verbetering. Vermeld de afnamedatum en geef aan dat sommige zaken mogelijk al zijn aangepakt. Wees specifiek en praktisch. Schrijf in het Nederlands met bullets.\n\n' + d + '\nOpen antwoorden samenvatting:\n' + oaStr;
-  fetch('https://anthropic-proxy.inefierens.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://anthropic-proxy.inefierens.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();}).then(function(d){
     if (d.error) { out.textContent = 'API fout: ' + d.error.type + ' - ' + d.error.message; return; }
     var text = d.content&&d.content[0]?d.content[0].text:'Geen resultaat.';
